@@ -1,5 +1,5 @@
-name = Github Widget
-description = Show github profile of a node autor.
+name = Github Widget Field
+description = Provides a simple field that allows you to add a Github repository to a content type, user, or any entity.
 core = 7.x
 package = koldo Picaza Development for Drupal
 dependencies[] = field_ui

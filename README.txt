@@ -1,5 +1,13 @@
 Github widget field
 
+The Github widget field module provides a simple field that allows you to add a
+Github repository to a content type, user, or any entity.
+
+Display types include:
+
+ * github_widget_jquery_formatter.
+ * github_widget_simple_text.
+
 Requirements: 
 	-field_ui
 	-Libraries
@@ -15,4 +23,11 @@ http://drupal.org/documentation/install/modules-themes/modules-7
 	
 	-unpack it to your Drupal /sites/all/modules directory
 	-# drush -y en github_widget	
+
+Usage:
+	-To use this module, create a new field of type 'Github repository widget'. This field will
+accept Github URLs path of the following format:
+
+ * username/repositoryname
+
 

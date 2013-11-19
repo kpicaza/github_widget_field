@@ -16,14 +16,14 @@
  * @see hook_field_schema()
  * @ingroup field_example
  */
-function github_widget_install(){
+function github_widget_field_install(){
 } 
 
-function github_widget_uninstall(){
+function github_widget_field_uninstall(){
 } 
 
 
-function github_widget_field_schema($field) {
+function github_widget_field_field_schema($field) {
    // Return array that contains.
 	if($field['type'] == 'github_widget'){
 		$schema['columns']['repository'] = array(

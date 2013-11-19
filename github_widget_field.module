@@ -4,7 +4,7 @@
  *
  * Provides the description of the field.
  */
-function github_widget_field_info() {
+function github_widget_field_field_info() {
   return array(
     // We name our field as the associative name of the array.
     'github_widget' => array(
@@ -20,7 +20,7 @@ function github_widget_field_info() {
  * Implements hook_field_validate().
  * @see field_example_field_widget_error()
  */
-function github_widget_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+function github_widget_field_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
   foreach ($items as $delta => $item) {
     if (!empty($item['repository'])) {
       if (!isDomainAvailible('https://github.com/'.$item['repository'])) {
@@ -40,7 +40,7 @@ function github_widget_field_validate($entity_type, $entity, $field, $instance, 
  * Return TRUE if it does not contain data, FALSE if it does. This lets
  * the form API flag an error when required fields are empty.
  */
-function github_widget_field_is_empty($item, $field) {
+function github_widget_field_field_is_empty($item, $field) {
 	if($field['type'] == 'github_widget'){
 		if(empty($item['repository'])){
 			return TRUE;
@@ -58,7 +58,7 @@ function github_widget_field_is_empty($item, $field) {
  *
  * @see field_example_field_formatter_view()
  */
-function github_widget_field_formatter_info() {
+function github_widget_field_field_formatter_info() {
   return array(
     // This formatter just displays the hex value in the color indicated.
     'github_widget_simple_text' => array(
@@ -85,7 +85,7 @@ function github_widget_field_formatter_info() {
  * @see field_example_field_formatter_info()
  */
  
-function github_widget_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+function github_widget_field_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
 
   switch ($display['type']) {
@@ -137,7 +137,7 @@ function github_widget_field_formatter_view($entity_type, $entity, $field, $inst
  *
  * @see field_example_field_widget_form()
  */
-function github_widget_field_widget_info() {
+function github_widget_field_field_widget_info() {
   return array(
     'github_widget_form' => array(
       'label' => t('text'),
@@ -149,7 +149,7 @@ function github_widget_field_widget_info() {
 /**
  * Implements hook_field_widget_form().
  */
-function github_widget_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+function github_widget_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
 	if ($instance['widget']['type'] == 'github_widget_form'){
 		$widget = $instance['widget'];
 		$settings = $widget['settings'];
@@ -171,7 +171,7 @@ function github_widget_field_widget_form(&$form, &$form_state, $field, $instance
  * @see field_example_field_validate()
  * @see form_error()
  */
-function github_widget_field_widget_error($element, $error, $form, &$form_state) {
+function github_widget_field_field_widget_error($element, $error, $form, &$form_state) {
   switch ($error['error']) {
     case 'github_widget_invalid':
       form_error($element, $error['message']);
@@ -179,7 +179,7 @@ function github_widget_field_widget_error($element, $error, $form, &$form_state)
   }
 }
 
-function github_widget_init() {
+function github_widget_field_init() {
 	if ($path = libraries_get_path('jquery.githubrepo')) {
         // Do something with the library, knowing the path, for instance:
 		drupal_add_js($path . '/jquery.githubRepoWidget.min.js');

@@ -180,7 +180,7 @@ function github_widget_field_widget_error($element, $error, $form, &$form_state)
 }
 
 function github_widget_init() {
-	if ($path = libraries_get_path('jquery.gihubrepo')) {
+	if ($path = libraries_get_path('jquery.githubrepo')) {
         // Do something with the library, knowing the path, for instance:
 		drupal_add_js($path . '/jquery.githubRepoWidget.min.js');
 	}

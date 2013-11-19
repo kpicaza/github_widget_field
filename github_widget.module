@@ -114,7 +114,7 @@ function github_widget_field_formatter_view($entity_type, $entity, $field, $inst
             'class' => 'github-widget',
             'data-repo' => $item['repository'],
           ),
-          '#value' => t('@code', array('@code' => $item['repository'])),
+          '#value' => t(''),
         );
       }
       break;

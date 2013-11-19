@@ -1,0 +1,7 @@
+*~
+*.log
+*.lock
+*.DS_Store
+*.swp
+*.out
+DOC*

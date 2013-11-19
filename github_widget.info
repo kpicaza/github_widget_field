@@ -1,0 +1,9 @@
+name = Github Widget
+description = Show github profile of a node autor.
+core = 7.x
+package = koldo Picaza Development for Drupal
+dependencies[] = field_ui
+dependencies[] = libraries
+files[] = github_widget.module   
+files[] = github_widget.install
+

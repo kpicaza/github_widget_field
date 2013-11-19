@@ -1,0 +1,208 @@
+<?php
+/**
+ * Implements hook_field_info().
+ *
+ * Provides the description of the field.
+ */
+function github_widget_field_info() {
+  return array(
+    // We name our field as the associative name of the array.
+    'github_widget' => array(
+      'label' => t('Github repository widget'),
+      'description' => t('Field that show github repository as widget.'),
+      'default_widget' => 'github_widget_form',
+      'default_formatter' => 'github_widget_simple_text',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_validate().
+ * @see field_example_field_widget_error()
+ */
+function github_widget_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  foreach ($items as $delta => $item) {
+    if (!empty($item['repository'])) {
+      if (!isDomainAvailible('https://github.com/'.$item['repository'])) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'github_widget_invalid',
+          'message' => t('Must be a valid github path'),
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_is_empty().
+ *
+ * hook_field_is_emtpy() is where Drupal asks us if this field is empty.
+ * Return TRUE if it does not contain data, FALSE if it does. This lets
+ * the form API flag an error when required fields are empty.
+ */
+function github_widget_field_is_empty($item, $field) {
+	if($field['type'] == 'github_widget'){
+		if(empty($item['repository'])){
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ *
+ * We need to tell Drupal that we have two different types of formatters
+ * for this field. One will change the text color, and the other will
+ * change the background color.
+ *
+ * @see field_example_field_formatter_view()
+ */
+function github_widget_field_formatter_info() {
+  return array(
+    // This formatter just displays the hex value in the color indicated.
+    'github_widget_simple_text' => array(
+      'label' => t('Simple text-based formatter'),
+      'field types' => array('github_widget'),
+    ),
+    // This formatter changes the background color of the content region.
+    'github_widget_jquery_formatter' => array(
+      'label' => t('Show widget of the repository'),
+      'field types' => array('github_widget'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ *
+ * Two formatters are implemented.
+ * - field_example_simple_text just outputs markup indicating the color that
+ *   was entered and uses an inline style to set the text color to that value.
+ * - field_example_color_background does the same but also changes the
+ *   background color of div.region-content.
+ *
+ * @see field_example_field_formatter_info()
+ */
+ 
+function github_widget_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  switch ($display['type']) {
+    // This formatter simply outputs the field as text and with a color.
+    case 'github_widget_simple_text':
+      foreach ($items as $delta => $item) {
+        $element[$delta] = array(
+          // We create a render array to produce the desired markup,
+          // "<p style="color: #hexcolor">The color code ... #hexcolor</p>".
+          // See theme_html_tag().
+          '#type' => 'html_tag',
+          '#tag' => 'p',
+          '#value' => t('Visit repository: @code', array('@code' => $item['repository'])),
+        );
+      }
+      break;
+
+    // This formatter adds css to the page changing the '.region-content' area's
+    // background color. If there are many fields, the last one will win.
+    case 'github_widget_jquery_formatter':
+      foreach ($items as $delta => $item) {
+        $element[$delta] = array(
+          '#type' => 'html_tag',
+          '#tag' => 'div',
+          '#attributes' => array(
+            'class' => 'github-widget',
+            'data-repo' => $item['repository'],
+          ),
+          '#value' => t('@code', array('@code' => $item['repository'])),
+        );
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ *
+ * Three widgets are provided.
+ * - A simple text-only widget where the user enters the '#ffffff'.
+ * - A 3-textfield widget that gathers the red, green, and blue values
+ *   separately.
+ * - A farbtastic colorpicker widget that chooses the value graphically.
+ *
+ * These widget types will eventually show up in hook_field_widget_form,
+ * where we will have to flesh them out.
+ *
+ * @see field_example_field_widget_form()
+ */
+function github_widget_field_widget_info() {
+  return array(
+    'github_widget_form' => array(
+      'label' => t('text'),
+      'field types' => array('github_widget'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function github_widget_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+	if ($instance['widget']['type'] == 'github_widget_form'){
+		$widget = $instance['widget'];
+		$settings = $widget['settings'];
+
+  		$element['repository'] = array(
+    		'#type' => 'textfield',
+    		'#default_value' => isset($items[$delta]['repository']) ? $items[$delta]['repository'] : '',
+  		);
+	}
+  return $element;
+}
+/**
+ * Implements hook_field_widget_error().
+ *
+ * hook_field_widget_error() lets us figure out what to do with errors
+ * we might have generated in hook_field_validate(). Generally, we'll just
+ * call form_error().
+ *
+ * @see field_example_field_validate()
+ * @see form_error()
+ */
+function github_widget_field_widget_error($element, $error, $form, &$form_state) {
+  switch ($error['error']) {
+    case 'github_widget_invalid':
+      form_error($element, $error['message']);
+      break;
+  }
+}
+
+function github_widget_init() {
+	if ($path = libraries_get_path('jquery.gihubrepo')) {
+        // Do something with the library, knowing the path, for instance:
+		drupal_add_js($path . '/jquery.githubRepoWidget.min.js');
+	}
+}
+function isDomainAvailible($domain){
+	//check, if a valid url is provided
+	if(!filter_var($domain, FILTER_VALIDATE_URL))
+	{
+		return false;
+	}
+
+	//initialize curl
+	$curlInit = curl_init($domain);
+	curl_setopt($curlInit,CURLOPT_CONNECTTIMEOUT,10);
+	curl_setopt($curlInit,CURLOPT_HEADER,true);
+	curl_setopt($curlInit,CURLOPT_NOBODY,true);
+	curl_setopt($curlInit,CURLOPT_RETURNTRANSFER,true);
+
+	//get answer
+	$response = curl_exec($curlInit);
+	curl_close($curlInit);
+	if ($response) return true;
+
+	return false;
+}

@@ -134,6 +134,8 @@ function github_widget_field_field_widget_form(&$form, &$form_state, $field, $in
 
   		$element['repository'] = array(
     		'#type' => 'textfield',
+		    '#title' => t('Github Repository'),
+		    '#description' => t('This field accepts Github URLs path in the following format: username/repositoryname'),
     		'#default_value' => isset($items[$delta]['repository']) ? $items[$delta]['repository'] : '',
   		);
 	}

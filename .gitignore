@@ -5,3 +5,5 @@
 *.swp
 *.out
 DOC*
+/nbproject/private/
+nbproject

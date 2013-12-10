@@ -55,12 +55,10 @@ function github_widget_field_field_is_empty($item, $field) {
  */
 function github_widget_field_field_formatter_info() {
   return array(
-    // This formatter just displays the hex value in the color indicated.
     'github_widget_simple_text' => array(
       'label' => t('Simple text-based formatter'),
       'field types' => array('github_widget'),
     ),
-    // This formatter changes the background color of the content region.
     'github_widget_jquery_formatter' => array(
       'label' => t('Show widget of the repository'),
       'field types' => array('github_widget'),
@@ -77,13 +75,10 @@ function github_widget_field_field_formatter_view($entity_type, $entity, $field,
   $element = array();
 
   switch ($display['type']) {
-    // This formatter simply outputs the field as text and with a color.
+    // This formatter simply outputs the field as text.
     case 'github_widget_simple_text':
       foreach ($items as $delta => $item) {
         $element[$delta] = array(
-          // We create a render array to produce the desired markup,
-          // "<p style="color: #hexcolor">The color code ... #hexcolor</p>".
-          // See theme_html_tag().
           '#type' => 'html_tag',
           '#tag' => 'p',
           '#value' => t('Visit repository: @code', array('@code' => $item['repository'])),
@@ -91,8 +86,7 @@ function github_widget_field_field_formatter_view($entity_type, $entity, $field,
       }
       break;
 
-    // This formatter adds css to the page changing the '.region-content' area's
-    // background color. If there are many fields, the last one will win.
+    // This formatter adds Joel Sutherdlan's widget appearance.
     case 'github_widget_jquery_formatter':
       foreach ($items as $delta => $item) {
         $element[$delta] = array(

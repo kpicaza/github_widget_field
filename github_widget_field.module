@@ -1,4 +1,10 @@
 <?php
+
+/**
+ * @file
+ * A field for share github repos and channels using the Field Types API.
+ */
+
 /**
  * Implements hook_field_info().
  *
@@ -23,7 +29,8 @@ function github_widget_field_field_info() {
 function github_widget_field_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
   foreach ($items as $delta => $item) {
     if (!empty($item['repository'])) {
-      if (!isDomainAvailible('https://github.com/'.$item['repository'])) {
+      // drupal_http_request($url);
+      if (!isDomainAvailible('https://github.com/' . $item['repository'])) {
         $errors[$field['field_name']][$langcode][$delta][] = array(
           'error' => 'github_widget_invalid',
           'message' => t('Must be a valid github path'),
@@ -41,17 +48,16 @@ function github_widget_field_field_validate($entity_type, $entity, $field, $inst
  * the form API flag an error when required fields are empty.
  */
 function github_widget_field_field_is_empty($item, $field) {
-	if($field['type'] == 'github_widget'){
-		if(empty($item['repository'])){
-			return TRUE;
-		}
-	}
-	return FALSE;
+  if ($field['type'] == 'github_widget') {
+    if (empty($item['repository'])) {
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
 
 /**
  * Implements hook_field_formatter_info().
- *
  */
 function github_widget_field_field_formatter_info() {
   return array(
@@ -68,12 +74,9 @@ function github_widget_field_field_formatter_info() {
 
 /**
  * Implements hook_field_formatter_view().
- *
  */
- 
 function github_widget_field_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
-
   switch ($display['type']) {
     // This formatter simply outputs the field as text.
     case 'github_widget_simple_text':
@@ -96,7 +99,7 @@ function github_widget_field_field_formatter_view($entity_type, $entity, $field,
             'class' => 'github-widget',
             'data-repo' => $item['repository'],
           ),
-          '#value' => t(''),
+          '#value' => t('github-widget'),
         );
       }
       break;
@@ -107,7 +110,6 @@ function github_widget_field_field_formatter_view($entity_type, $entity, $field,
 
 /**
  * Implements hook_field_widget_info().
- *
  */
 function github_widget_field_field_widget_info() {
   return array(
@@ -122,19 +124,19 @@ function github_widget_field_field_widget_info() {
  * Implements hook_field_widget_form().
  */
 function github_widget_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-	if ($instance['widget']['type'] == 'github_widget_form'){
-		$widget = $instance['widget'];
-		$settings = $widget['settings'];
-
-  		$element['repository'] = array(
-    		'#type' => 'textfield',
-		    '#title' => t('Github Repository'),
-		    '#description' => t('This field accepts Github URLs path in the following format: username/repositoryname'),
-    		'#default_value' => isset($items[$delta]['repository']) ? $items[$delta]['repository'] : '',
-  		);
-	}
+  if ($instance['widget']['type'] == 'github_widget_form') {
+    $widget = $instance['widget'];
+    $settings = $widget['settings'];
+    $element['repository'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Github Repository'),
+      '#description' => t('This field accepts Github URLs path in the following format: username/repositoryname'),
+      '#default_value' => isset($items[$delta]['repository']) ? $items[$delta]['repository'] : '',
+    );
+  }
   return $element;
 }
+
 /**
  * Implements hook_field_widget_error().
  *
@@ -152,30 +154,44 @@ function github_widget_field_field_widget_error($element, $error, $form, &$form_
   }
 }
 
+/**
+ * Implements hook_field_init().
+ */
 function github_widget_field_init() {
-	if ($path = libraries_get_path('jquery.githubrepo')) {
-        // Do something with the library, knowing the path, for instance:
-		drupal_add_js($path . '/jquery.githubRepoWidget.min.js');
-	}
+  $path = libraries_get_path('jquery.githubrepo');
+  if ($path) {
+    // Do something with the library, knowing the path, for instance:
+    drupal_add_js($path . '/jquery.githubRepoWidget.min.js');
+  }
 }
-function isDomainAvailible($domain){
-	//check, if a valid url is provided
-	if(!filter_var($domain, FILTER_VALIDATE_URL))
-	{
-		return false;
-	}
 
-	//initialize curl
-	$curlInit = curl_init($domain);
-	curl_setopt($curlInit,CURLOPT_CONNECTTIMEOUT,10);
-	curl_setopt($curlInit,CURLOPT_HEADER,true);
-	curl_setopt($curlInit,CURLOPT_NOBODY,true);
-	curl_setopt($curlInit,CURLOPT_RETURNTRANSFER,true);
-
-	//get answer
-	$response = curl_exec($curlInit);
-	curl_close($curlInit);
-	if ($response) return true;
-
-	return false;
+/**
+ * Implements curl call to verify if domain exist.
+ * 
+ * This function must be replace with drupal function drupal_http_request().
+ * 
+ * @param string $domain
+ *   $domain url as https://github.com/user/repo .
+ * 
+ * @return bool
+ *   Returns true when url exist.
+ */
+function isDomainAvailible($domain) {
+  // Check, if a valid url is provided.
+  if (!filter_var($domain, FILTER_VALIDATE_URL)) {
+    return FALSE;
+  }
+  // Initialize curl.
+  $curl_init = curl_init($domain);
+  curl_setopt($curl_init, CURLOPT_CONNECTTIMEOUT, 10);
+  curl_setopt($curl_init, CURLOPT_HEADER, TRUE);
+  curl_setopt($curl_init, CURLOPT_NOBODY, TRUE);
+  curl_setopt($curl_init, CURLOPT_RETURNTRANSFER, TRUE);
+  // Get answer.
+  $response = curl_exec($curl_init);
+  curl_close($curl_init);
+  if ($response) {
+    return TRUE;
+  }
+  return FALSE;
 }

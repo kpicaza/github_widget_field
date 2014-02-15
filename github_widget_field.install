@@ -1,5 +1,8 @@
 <?php
+
 /**
+ * @file
+ * Install, update, and uninstall functions for the github_widget_field module.
  * Implements hook_field_schema().
  *
  * Defines the database schema of the field, using the format used by the
@@ -12,25 +15,27 @@
  * @see schemaapi
  * @see hook_field_schema()
  */
-function github_widget_field_install(){
-} 
 
-function github_widget_field_uninstall(){
-} 
-
-
+/**
+ * Implements github_widget_field daabase schema.
+ * 
+ * @param array $field 
+ *   $field drupal fields array.
+ * 
+ * @return array
+ *   array with type, columns & indexes. 
+ */
 function github_widget_field_field_schema($field) {
-   // Return array that contains.
-	if($field['type'] == 'github_widget'){
-		$schema['columns']['repository'] = array(
-			'type' => 'varchar',
-			'length' => '40',
-			'not null' => FALSE,
-		);
-		$schema['indexes'] = array(
-			'repository' => array('repository'),
-		);
-	}
-	return $schema;
+  // Return array that contains.
+  if ($field['type'] == 'github_widget') {
+    $schema['columns']['repository'] = array(
+      'type' => 'varchar',
+      'length' => '40',
+      'not null' => FALSE,
+    );
+    $schema['indexes'] = array(
+      'repository' => array('repository'),
+    );
+  }
+  return $schema;
 }
-

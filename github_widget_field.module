@@ -24,16 +24,28 @@ function github_widget_field_field_info() {
 
 /**
  * Implements hook_field_validate().
+ * 
+ * First check if url is valid.
+ * Then make request to github.com to obtain valid response.
+ *  
  * @see field_example_field_widget_error()
  */
 function github_widget_field_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
   foreach ($items as $delta => $item) {
     if (!empty($item['repository'])) {
-      // drupal_http_request($url);
-      if (!isDomainAvailible('https://github.com/' . $item['repository'])) {
+      $url = 'https://github.com/' . $item['repository'];
+      if (!valid_url($url)) {
         $errors[$field['field_name']][$langcode][$delta][] = array(
           'error' => 'github_widget_invalid',
-          'message' => t('Must be a valid github path'),
+          'message' => t('Github repository url must have valid characters'),
+        );
+        continue;
+      }
+      $response = drupal_http_request($url);
+      if ($response->code != 200) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'github_widget_invalid',
+          'message' => t('Github repository url must be a valid github path'),
         );
       }
     }
@@ -163,35 +175,4 @@ function github_widget_field_init() {
     // Do something with the library, knowing the path, for instance:
     drupal_add_js($path . '/jquery.githubRepoWidget.min.js');
   }
-}
-
-/**
- * Implements curl call to verify if domain exist.
- * 
- * This function must be replace with drupal function drupal_http_request().
- * 
- * @param string $domain
- *   $domain url as https://github.com/user/repo .
- * 
- * @return bool
- *   Returns true when url exist.
- */
-function isDomainAvailible($domain) {
-  // Check, if a valid url is provided.
-  if (!filter_var($domain, FILTER_VALIDATE_URL)) {
-    return FALSE;
-  }
-  // Initialize curl.
-  $curl_init = curl_init($domain);
-  curl_setopt($curl_init, CURLOPT_CONNECTTIMEOUT, 10);
-  curl_setopt($curl_init, CURLOPT_HEADER, TRUE);
-  curl_setopt($curl_init, CURLOPT_NOBODY, TRUE);
-  curl_setopt($curl_init, CURLOPT_RETURNTRANSFER, TRUE);
-  // Get answer.
-  $response = curl_exec($curl_init);
-  curl_close($curl_init);
-  if ($response) {
-    return TRUE;
-  }
-  return FALSE;
 }

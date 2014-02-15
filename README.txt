@@ -22,10 +22,10 @@ http://drupal.org/documentation/install/modules-themes/modules-7
 	-or-
 	
 	-unpack it to your Drupal /sites/all/modules directory
-	-# drush -y en github_widget	
+	-# drush -y en github_widget_field	
 
 Usage:
-	-To use this module, create a new field of type 'Github repository widget'. This field will
+	-To use this module, go to strycture/content_types & create a new field of type 'Github repository widget'. This field will
 accept Github URLs path of the following format:
 
  * username/repositoryname

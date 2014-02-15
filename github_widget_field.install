@@ -23,7 +23,7 @@
  *   $field drupal fields array.
  * 
  * @return array
- *   array with type, columns & indexes. 
+ *   field keys type, columns & indexes. 
  */
 function github_widget_field_field_schema($field) {
   // Return array that contains.
